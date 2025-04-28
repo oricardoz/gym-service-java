@@ -1,12 +1,17 @@
 package com.ricardo.gym.service;
 
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ricardo.gym.config.security.TokenService;
 import com.ricardo.gym.dto.LoginRequestDTO;
 import com.ricardo.gym.dto.LoginResponseDTO;
+import com.ricardo.gym.dto.RegisterRequestDTO;
+import com.ricardo.gym.dto.RegisterResponseDTO;
 import com.ricardo.gym.model.User;
+import com.ricardo.gym.model.enums.EUserType;
 import com.ricardo.gym.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +35,26 @@ public class AuthService {
         
         String tokenJWT = this.tokenService.generateToken(user);
         return new LoginResponseDTO(tokenJWT);
+    }
+
+    public RegisterResponseDTO register(RegisterRequestDTO req){
+        
+        User user = this.repository.findByEmail(req.email()).orElseGet(null);
+
+        if(user == null){
+            throw new RuntimeException("There is already a user with that email");
+        }
+
+        user = User.builder()
+                .email(req.email())
+                .userRole(EUserType.STUDENT)
+                .password(passwordEnconder.encode(req.password()))
+                .build();
+
+        this.repository.save(user);    
+
+        String tokenJWT = this.tokenService.generateToken(user);
+        return new RegisterResponseDTO(tokenJWT);
     }
 
 
