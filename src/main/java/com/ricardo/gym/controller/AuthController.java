@@ -23,7 +23,7 @@ public class AuthController {
 
     private final AuthService service;
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO req){
         
         LoginResponseDTO resp = this.service.login(req);

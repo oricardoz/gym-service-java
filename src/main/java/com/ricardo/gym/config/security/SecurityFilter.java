@@ -31,19 +31,20 @@ public class SecurityFilter extends OncePerRequestFilter{
             throws ServletException, IOException {
 
         String token = this.recoverTokenJWT(request);
-        String userEmail = service.validateToken(token);
-
-        configureUserAuthentication(userEmail);
+        
+        if (token != null) {
+            String userEmail = service.validateToken(token);    
+            configureUserAuthentication(userEmail);
+        }
 
         filterChain.doFilter(request, response);
-        
     }
 
-    private String recoverTokenJWT(HttpServletRequest request) throws ServletException {
+    private String recoverTokenJWT(HttpServletRequest request) {
         String authorizationHeader = request.getHeader("Authorization");
 
         if(authorizationHeader == null || authorizationHeader.isEmpty()){
-            throw new ServletException("Authorization header is missing"); 
+            return null;
         }
 
         return authorizationHeader.replace("Bearer ", "");

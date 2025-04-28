@@ -1,7 +1,5 @@
 package com.ricardo.gym.service;
 
-import java.util.Optional;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,9 +37,9 @@ public class AuthService {
 
     public RegisterResponseDTO register(RegisterRequestDTO req){
         
-        User user = this.repository.findByEmail(req.email()).orElseGet(null);
+        User user = this.repository.findByEmail(req.email()).orElse(null);
 
-        if(user == null){
+        if(user != null){
             throw new RuntimeException("There is already a user with that email");
         }
 
@@ -56,8 +54,4 @@ public class AuthService {
         String tokenJWT = this.tokenService.generateToken(user);
         return new RegisterResponseDTO(tokenJWT);
     }
-
-
-
-
 }
