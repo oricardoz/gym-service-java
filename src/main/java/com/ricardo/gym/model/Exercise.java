@@ -1,5 +1,7 @@
 package com.ricardo.gym.model;
 
+import com.ricardo.gym.dto.ExerciseCreateRequestDTO;
+import com.ricardo.gym.dto.ExerciseResponseDTO;
 import com.ricardo.gym.model.enums.ECategoryExercise;
 
 import jakarta.persistence.Entity;
@@ -32,5 +34,20 @@ public class Exercise {
 
     @Enumerated(EnumType.STRING)
     private ECategoryExercise category;
+
+    public ExerciseResponseDTO toDTO(){
+
+        return new ExerciseResponseDTO(
+            this.name,
+            this.description,
+            this.category.name()
+        );
+    }
+
+    public Exercise(ExerciseCreateRequestDTO dto){
+        this.name = dto.name();
+        this.description = dto.description();
+        this.category = ECategoryExercise.valueOf(dto.category());
+    }
 
 }

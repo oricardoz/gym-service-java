@@ -1,14 +1,23 @@
 package com.ricardo.gym.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ricardo.gym.dto.ExerciseCreateRequestDTO;
+import com.ricardo.gym.dto.ExerciseResponseDTO;
 import com.ricardo.gym.service.ExerciseService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequestMapping("api/v1/exercises")
@@ -18,13 +27,25 @@ public class ExerciseController {
 
     private final ExerciseService service;
 
-    private static final Logger loggerExerciseController = LoggerFactory.getLogger(ExerciseController.class);
-
     @GetMapping()
-    public ResponseEntity<?> listExercises(){
+    public ResponseEntity<List<ExerciseResponseDTO>> getExercises(){
 
-        
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body(service.getAllExercises());
+    }
+    
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ExerciseResponseDTO> getExerciseById(@PathVariable int id){
+
+        return ResponseEntity.status(HttpStatus.OK).body(service.getExerciseById(id));
+    }
+
+    @PostMapping()
+    public ResponseEntity<?> createExercise(@Valid @RequestBody ExerciseCreateRequestDTO req) {
+        Long id = service.createExercise(req);
+        return ResponseEntity
+            .created(URI.create("/api/v1/exercises/" + id))
+            .build();
     }
 
 }
