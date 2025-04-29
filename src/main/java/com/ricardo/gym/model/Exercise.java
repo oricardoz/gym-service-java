@@ -1,6 +1,10 @@
 package com.ricardo.gym.model;
 
+import com.ricardo.gym.model.enums.ECategoryExercise;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,10 +30,7 @@ public class Exercise {
 
     private String description;
 
-    private int sets;
-
-    private int repetitions;
-
-    private double weight;
+    @Enumerated(EnumType.STRING)
+    private ECategoryExercise category;
 
 }

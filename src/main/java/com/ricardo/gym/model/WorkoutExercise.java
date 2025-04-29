@@ -1,12 +1,10 @@
 package com.ricardo.gym.model;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,23 +16,21 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@Entity(name = "workout_plans")
-public class WorkoutPlan {
+@Entity(name = "workout_exercises")
+public class WorkoutExercise {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    @ManyToOne(optional = false)
+    private WorkoutPlan workoutPlan;
 
-    private User student;
+    @ManyToOne(optional = false)
+    private Exercise exercise;
 
-    private User instructor;
+    private Integer sets;
+    private Integer repetitions;
+    private Double weight;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime expiresAt;
-
-    private List<Exercise> exercises;
-    
 }
