@@ -40,6 +40,6 @@ public class WorkoutPlan {
     private LocalDateTime expiresAt;
 
     @OneToMany
-    private List<Exercise> exercises;
+    private List<WorkoutExercise> exercises;
     
 }
