@@ -1,6 +1,8 @@
 package com.ricardo.gym.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,8 +14,11 @@ import java.time.Instant;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> globalExceptionHandler(Exception e, HttpServletRequest request) {
+        logger.error("Unhandled exception at path {}: {}", request.getRequestURI(), e.getMessage(), e);
 
         ErrorResponse error = ErrorResponse.builder()
                 .message("Error Processing Request")
@@ -28,6 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException e, HttpServletRequest request) {
+        logger.warn("Resource not found at path {}: {}", request.getRequestURI(), e.getMessage(), e);
 
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(Instant.now())
@@ -42,6 +48,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        logger.warn("Validation error at path {}: {}", request.getRequestURI(), e.getMessage(), e);
 
         ValidationErrorResponse error = new ValidationErrorResponse();
         error.setTimestamp(Instant.now());
@@ -54,5 +61,35 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(error);
+    }
+
+    @ExceptionHandler(TokenCreationException.class)
+    public ResponseEntity<ErrorResponse> handleTokenCreating(TokenCreationException e, HttpServletRequest request) {
+        logger.error("Token creation error at path {}: {}", request.getRequestURI(), e.getMessage(), e);
+
+        ErrorResponse error = ErrorResponse.builder()
+                .message(e.getMessage())
+                .error("Server error")
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    @ExceptionHandler(TokenValidationException.class)
+    public ResponseEntity<ErrorResponse> handleTokenCreating(TokenValidationException e, HttpServletRequest request) {
+        logger.error("Token validation error at path {}: {}", request.getRequestURI(), e.getMessage(), e);
+
+        ErrorResponse error = ErrorResponse.builder()
+                .message("Invalid token")
+                .error("Unauthorized")
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 }

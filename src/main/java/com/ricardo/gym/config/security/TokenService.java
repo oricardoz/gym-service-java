@@ -4,6 +4,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import com.ricardo.gym.exception.TokenCreationException;
+import com.ricardo.gym.exception.TokenValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.auth0.jwt.algorithms.Algorithm;
@@ -21,20 +25,25 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
+
     public String generateToken(User user) {
+
+        logger.info("User ");
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            String tokenJWT = JWT.create()
+            String token = JWT.create()
                         .withIssuer("login-auth-api")
                         .withSubject(user.getEmail())
                         .withExpiresAt(this.generateExpirationDate())
                         .sign(algorithm);
 
-            return tokenJWT;
+            logger.info("Authentication token generated for user: {}", user.getEmail());
 
+            return token;
         } catch (JWTCreationException exception){
-            throw new RuntimeException("Error while authenticating");
+            throw new TokenCreationException("Error while creating token");
         }
 
     }
@@ -43,15 +52,14 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            String userEmail = JWT.require(algorithm)
+            return JWT.require(algorithm)
                     .withIssuer("login-auth-api")
                     .build()
                     .verify(token)
                     .getSubject();
 
-            return userEmail;
         } catch (JWTVerificationException exception) {
-            throw new RuntimeException("Error while authenticating");
+            throw new TokenValidationException("Error while authenticating token");
         }
     }
 
