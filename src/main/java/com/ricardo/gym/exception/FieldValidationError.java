@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class FieldValidationError {
-    private String field;
-    private String message;
+    private final String field;
+    private final String message;
 }
