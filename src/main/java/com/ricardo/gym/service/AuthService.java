@@ -8,6 +8,8 @@ import com.ricardo.gym.dto.LoginRequestDTO;
 import com.ricardo.gym.dto.LoginResponseDTO;
 import com.ricardo.gym.dto.RegisterRequestDTO;
 import com.ricardo.gym.dto.RegisterResponseDTO;
+import com.ricardo.gym.exception.EmailAlreadyExistsException;
+import com.ricardo.gym.exception.InvalidCredentialsException;
 import com.ricardo.gym.model.User;
 import com.ricardo.gym.model.enums.EUserType;
 import com.ricardo.gym.repository.UserRepository;
@@ -25,10 +27,10 @@ public class AuthService {
     public LoginResponseDTO login(LoginRequestDTO req){
         
         User user = this.repository.findByEmail(req.email())
-                            .orElseThrow(() -> new RuntimeException("Wrong credentials"));
+                            .orElseThrow(InvalidCredentialsException::new);
 
         if(!passwordEnconder.matches(req.password(), user.getPassword())){
-            throw new RuntimeException("Wrong credentials");
+            throw new InvalidCredentialsException();
         }
         
         String tokenJWT = this.tokenService.generateToken(user);
@@ -40,7 +42,7 @@ public class AuthService {
         User user = this.repository.findByEmail(req.email()).orElse(null);
 
         if(user != null){
-            throw new RuntimeException("There is already a user with that email");
+            throw new EmailAlreadyExistsException();
         }
 
         user = User.builder()

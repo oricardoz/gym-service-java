@@ -1,6 +1,7 @@
 package com.ricardo.gym.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.time.Instant;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.time.Instant;
+import jakarta.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -92,4 +93,35 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException e, HttpServletRequest request) {
+        logger.warn("Invalid credentials at {}: {}", request.getRequestURI(), e.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .message(e.getMessage())
+                .error("Unauthorized")
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyExists(EmailAlreadyExistsException e, HttpServletRequest request) {
+        logger.warn("Attempt to register with existing email at {}: {}", request.getRequestURI(), e.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .message(e.getMessage())
+                .error("Conflict")
+                .status(HttpStatus.CONFLICT.value())
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
 }

@@ -88,17 +88,20 @@
 			<version>4.4.0</version>
 		</dependency>
 		<dependency>
-		<groupId>org.slf4j</groupId>
-		<artifactId>slf4j-api</artifactId>
-		<version>2.0.13</version> <!-- Versão atual -->
-	</dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
 
-	<!-- Implementação: Logback -->
-	<dependency>
-		<groupId>ch.qos.logback</groupId>
-		<artifactId>logback-classic</artifactId>
-		<version>1.4.14</version> <!-- Última versão até agora -->
-	</dependency>
+		<!-- Implementação: Logback -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+		</dependency>
+		
 	</dependencies>
 
 	<build>
