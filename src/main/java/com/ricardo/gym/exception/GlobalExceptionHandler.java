@@ -124,4 +124,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException e, HttpServletRequest request) {
+        logger.warn("User not found at {}: {}", request.getRequestURI(), e.getMessage());
+
+        ErrorResponse error = ErrorResponse.builder()
+                .message(e.getMessage())
+                .error("Invalid Arguments")
+                .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                .timestamp(Instant.now())
+                .path(request.getRequestURI())
+                .build();
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
 }
