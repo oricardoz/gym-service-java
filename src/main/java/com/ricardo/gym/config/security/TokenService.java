@@ -26,42 +26,48 @@ public class TokenService {
     private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
 
     public String generateToken(User user) {
-
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            String token = JWT.create()
-                        .withIssuer("login-auth-api")
-                        .withSubject(user.getEmail())
-                        .withExpiresAt(this.generateExpirationDate())
-                        .sign(algorithm);
+            Instant expiration = this.generateExpirationDate();
 
-            logger.info("Authentication token generated for user: {}", user.getEmail());
+            String token = JWT.create()
+                    .withIssuer("login-auth-api")
+                    .withSubject(user.getEmail())
+                    .withExpiresAt(expiration)
+                    .sign(algorithm);
+
+            logger.info("JWT token successfully generated for user {}. Expires at {}", user.getEmail(), expiration);
 
             return token;
         } catch (JWTCreationException exception){
+            logger.error("Failed to generate token for user {}: {}", user.getEmail(), exception.getMessage(), exception);
             throw new TokenCreationException("Error while creating token");
         }
-
     }
 
     public String validateToken(String token) {
         try {
+            logger.debug("Validating JWT token: {}", token);
+
             Algorithm algorithm = Algorithm.HMAC256(secret);
 
-            return JWT.require(algorithm)
+            String subject = JWT.require(algorithm)
                     .withIssuer("login-auth-api")
                     .build()
                     .verify(token)
                     .getSubject();
 
+            logger.info("JWT token successfully validated for subject: {}", subject);
+
+            return subject;
         } catch (JWTVerificationException exception) {
-            throw new TokenValidationException("Error while authenticating token");
+            logger.warn("JWT token validation failed: {}", exception.getMessage(), exception);
+            throw new TokenValidationException("Error while validating token");
         }
     }
 
-    private Instant generateExpirationDate(){
+    private Instant generateExpirationDate() {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
-    
 }

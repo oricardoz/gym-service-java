@@ -2,6 +2,7 @@ package com.ricardo.gym.config.security;
 
 import java.io.IOException;
 
+import com.ricardo.gym.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class SecurityFilter extends OncePerRequestFilter{
         if (token != null) {
             String userEmail = service.validateToken(token);    
             configureUserAuthentication(userEmail);
-            securityFilterLogger.info("User authenticated successfully: {} , accessing the url: {}", userEmail, request.getRequestURI());
+            securityFilterLogger.info("User authenticated successfully: {}  accessing : {}", userEmail, request.getRequestURI());
         }
 
         filterChain.doFilter(request, response);
@@ -49,6 +50,7 @@ public class SecurityFilter extends OncePerRequestFilter{
         String authorizationHeader = request.getHeader("Authorization");
 
         if(authorizationHeader == null || authorizationHeader.isEmpty()){
+            securityFilterLogger.warn("Req without header: {}", request.getRequestURI());
             return null;
         }
 
@@ -57,7 +59,7 @@ public class SecurityFilter extends OncePerRequestFilter{
 
     private void configureUserAuthentication(String email){
         User user = repository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("User Not Found"));
+                        .orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
         var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthoritys());
         SecurityContextHolder.getContext().setAuthentication(authentication);

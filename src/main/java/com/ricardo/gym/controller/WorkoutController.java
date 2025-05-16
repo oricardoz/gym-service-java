@@ -4,14 +4,11 @@ import java.net.URI;
 import java.security.Principal;
 import java.util.List;
 
+import com.ricardo.gym.dto.ExerciseResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ricardo.gym.dto.WorkoutCreateRequestDTO;
 import com.ricardo.gym.dto.WorkoutResponseDTO;
@@ -21,7 +18,7 @@ import com.ricardo.gym.service.WorkoutService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/workout")
+@RequestMapping("/api/v1/workouts")
 @RequiredArgsConstructor
 public class WorkoutController {
 
@@ -31,6 +28,12 @@ public class WorkoutController {
     public ResponseEntity<List<WorkoutResponseDTO>> getAllWorkout() {
 
         return ResponseEntity.status(HttpStatus.OK).body(service.getAllWorkout());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<WorkoutResponseDTO> getWorkoutById(@PathVariable int id){
+
+        return ResponseEntity.status(HttpStatus.OK).body(service.findWorkoutById(id));
     }
 
     @PostMapping

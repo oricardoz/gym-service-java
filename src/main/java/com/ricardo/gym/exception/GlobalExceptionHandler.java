@@ -80,7 +80,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TokenValidationException.class)
-    public ResponseEntity<ErrorResponse> handleTokenCreating(TokenValidationException e, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handleValidationCreating(TokenValidationException e, HttpServletRequest request) {
         logger.error("Token validation error at path {}: {}", request.getRequestURI(), e.getMessage(), e);
 
         ErrorResponse error = ErrorResponse.builder()

@@ -35,8 +35,7 @@ public class WorkoutService {
         
         return workoutPlanRepository.findAll()
         .stream()
-        .map(workout -> 
-            new WorkoutResponseDTO(workout))
+        .map(WorkoutResponseDTO::new)
         .collect(Collectors.toList());
     }
 
@@ -77,4 +76,11 @@ public class WorkoutService {
         return createdWorkout.getId();
     }
 
+    public WorkoutResponseDTO findWorkoutById(int id) {
+
+        WorkoutPlan workout = workoutPlanRepository.findById((long) id).orElseThrow(() ->
+                new RuntimeException("Workout not found"));
+
+        return new WorkoutResponseDTO(workout);
+    }
 }

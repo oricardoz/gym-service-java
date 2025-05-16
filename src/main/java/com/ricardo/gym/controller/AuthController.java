@@ -15,7 +15,7 @@ import com.ricardo.gym.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
-@RequestMapping("/auth")
+@RequestMapping("api/v1/auth")
 @RestController
 @RequiredArgsConstructor
 public class AuthController {
